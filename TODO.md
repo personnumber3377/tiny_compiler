@@ -1,0 +1,3 @@
+- Support decisions (less than, greater than etc) (kinda done???)
+- Support checking with the actual armlet processor???
+- Add optimization loops.

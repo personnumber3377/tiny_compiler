@@ -112,6 +112,35 @@ def compile_line(line):
 
     return []
 
+def compile_if(condition, body_lines):
+    cond = condition.strip()
+    end = new_label("if_end")
+    code = []
+
+    m = re.match(r"(x\d+)\s*<\s*(x\d+)", cond)
+    if m:
+        a, b = m.group(1), m.group(2)
+        code.append(f"cmp ${a[1:]}, ${b[1:]}")
+        code.append(f"bge {end}")
+    else:
+        m = re.match(r"(x\d+)\s*>\s*(x\d+)", cond)
+        if m:
+            a, b = m.group(1), m.group(2)
+            code.append(f"cmp ${a[1:]}, ${b[1:]}")
+            code.append(f"ble {end}")
+        else:
+            m = re.match(r"(x\d+)\s*==\s*(x\d+)", cond)
+            if not m:
+                raise Exception("unsupported if condition")
+            a, b = m.group(1), m.group(2)
+            code.append(f"cmp ${a[1:]}, ${b[1:]}")
+            code.append(f"bne {end}")
+
+    for line in body_lines:
+        code += compile([line])
+
+    code.append(f"{end}:")
+    return code
 
 def compile_while(condition, body_lines):
     cond = condition.strip()
@@ -158,6 +187,16 @@ def compile(lines):
                 i += 1
 
             out += compile_while(condition, body)
+            continue
+
+        if line.startswith("if"):
+            condition = line[len("if"):].strip().rstrip(":")
+            i += 1
+            body = []
+            while i < len(lines) and lines[i].startswith("    "):
+                body.append(lines[i].strip())
+                i += 1
+            out += compile_if(condition, body)
             continue
 
         out += compile_line(line)
