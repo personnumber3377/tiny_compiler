@@ -82,9 +82,11 @@ def compile_line(line):
         dprint("line: "+str(line))
         left, right = map(str.strip, line.split("="))
         expr = parse_expr(left, right)
+        dprint("expr: "+str(expr))
+        # if len(expr) == 3: # Memory storage instruction?
+        #     assert expr[0] == "store_register" # The only instruction which has length 3 as expr length
 
-        if len(expr) == 3: # Memory storage instruction?
-            assert expr[0] == "store_register" # The only instruction which has length 3 as expr length
+        if expr[0] == "store_register":
             return [f"sto ${expr[1][1]}, ${expr[2][1]}"]
 
         if expr[0] == "mov":
