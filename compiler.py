@@ -114,7 +114,7 @@ def compile_line(line):
 
 def compile_if(condition, body_lines):
     cond = condition.strip()
-    end = new_label("if_end")
+    end = new_label("ifend")
     code = []
 
     # x OP x
@@ -165,8 +165,8 @@ def compile_while(condition, body_lines):
 
     a, b = m.group(1), m.group(2)
 
-    start = new_label("while_start")
-    end = new_label("while_end")
+    start = new_label("whilestart")
+    end = new_label("whileend")
 
     code = []
     code.append(f"{start}:")

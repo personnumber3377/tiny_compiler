@@ -1,0 +1,82 @@
+# Here is some wrapper code to test your solution:
+
+        mov     $0, >test_data  # set up the address where to get the data
+        mov     $1, >test_len   # set up address where to get the length
+        loa     $1, $1          # load the length from memory to $1
+
+# Your solution starts here ...
+# ------------------------------------------
+        
+mov $3, 0
+@whilestart0:
+cmp $3, $1
+bge >whileend1
+mov $4, 0
+@whilestart2:
+cmp $4, $1
+bge >whileend3
+jmp >whilestart2
+@whileend3:
+add $7, $4, 1
+cmp $7, $1
+bge >ifend4
+@ifend4:
+add $5, $0, $4
+loa $6, $5
+add $7, $5, 1
+loa $2, $7
+jmp >whilestart0
+@whileend1:
+cmp $6, $2
+ble >ifend5
+sto $5, $2
+sto $7, $6
+@ifend5:
+add $4, $4, 1
+add $3, $3, 1
+loa $4, $0
+mov $5, 1
+mov $2, $4
+mov $6, 1
+mov $3, 1
+@whilestart6:
+cmp $3, $1
+bge >whileend7
+add $7, $0, $3
+loa $7, $7
+jmp >whilestart6
+@whileend7:
+cmp $7, $4
+bne >ifend8
+add $5, $5, 1
+@ifend8:
+cmp $7, $4
+ble >ifend9
+cmp $6, $5
+bge >ifend10
+@ifend10:
+mov $6, $5
+mov $2, $4
+@ifend9:
+mov $4, $7
+mov $5, 1
+add $3, $3, 1
+cmp $6, $5
+bge >ifend11
+mov $6, $5
+mov $2, $4
+@ifend11:
+
+
+# ------------------------------------------
+# ... and ends here 
+
+        hlt                     # the processor stops here
+
+# Here is the test data:
+# (the most frequent value is 56369 with frequency 5 in the array)
+
+@test_len:
+        %data   23
+@test_data:
+        %data   18701, 1100, 590, 17017, 56369, 19296, 1100, 56369, 1100, 56369, 590, 18701, 19296, 19296, 56369, 1100, 55034, 590, 29135, 18701, 18701, 29135, 56369
