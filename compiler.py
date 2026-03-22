@@ -15,11 +15,29 @@ def new_label(prefix="L"):
     label_counter += 1
     return label
 
-def parse_expr(expr):
+def parse_expr(left, expr):
     expr = expr.strip()
 
     dprint(expr)
 
+    # First check if we are storing into memory, since it is special and has square brackets on the left hand side...
+
+    # mem[x] = rN or mem[x] = 
+    m = re.match(r"mem\[(x\d+)\]", left)
+    if m:
+        # Now check if the right hand side is a register or if it is just a number...
+        m2 = re.match(r"(x\d+)", expr)
+        if m2: # Register value, so therefore it is storing the register value...
+            return ("store_register", m.group(1), m2.group(1))
+        # Actually this is not even supported by the instruction set architecture :D
+        '''
+        m2 = re.match(r"(\d+)", expr) # Immediate address???
+        if m2:
+            return ("store_immediate", m.group(1), m2.group(1))
+        '''
+        # ???
+        raise Exception(f"Unknown expr: {expr}")
+    
     # x = mem[y]
     m = re.match(r"mem\[(x\d+)\]", expr)
     if m:
@@ -63,7 +81,11 @@ def compile_line(line):
     if "=" in line and not line.startswith("while"):
         dprint("line: "+str(line))
         left, right = map(str.strip, line.split("="))
-        expr = parse_expr(right)
+        expr = parse_expr(left, right)
+
+        if len(expr) == 3: # Memory storage instruction?
+            assert expr[0] == "store_register" # The only instruction which has length 3 as expr length
+            return [f"sto ${expr[1][1]}, ${expr[2][1]}"]
 
         if expr[0] == "mov":
             return [f"mov ${left[1]}, ${expr[1][1]}"]
