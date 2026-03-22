@@ -117,25 +117,38 @@ def compile_if(condition, body_lines):
     end = new_label("if_end")
     code = []
 
-    m = re.match(r"(x\d+)\s*<\s*(x\d+)", cond)
+    # x OP x
+    m = re.match(r"(x\d+)\s*(==|<|>)\s*(x\d+)", cond)
     if m:
-        a, b = m.group(1), m.group(2)
+        a, op, b = m.groups()
+
         code.append(f"cmp ${a[1:]}, ${b[1:]}")
-        code.append(f"bge {end}")
-    else:
-        m = re.match(r"(x\d+)\s*>\s*(x\d+)", cond)
-        if m:
-            a, b = m.group(1), m.group(2)
-            code.append(f"cmp ${a[1:]}, ${b[1:]}")
+
+        if op == "<":
+            code.append(f"bge {end}")
+        elif op == ">":
             code.append(f"ble {end}")
-        else:
-            m = re.match(r"(x\d+)\s*==\s*(x\d+)", cond)
-            if not m:
-                raise Exception("unsupported if condition")
-            a, b = m.group(1), m.group(2)
-            code.append(f"cmp ${a[1:]}, ${b[1:]}")
+        elif op == "==":
             code.append(f"bne {end}")
 
+    else:
+        # x OP immediate
+        m = re.match(r"(x\d+)\s*(==|<|>)\s*(\d+)", cond)
+        if not m:
+            raise Exception(f"unsupported if condition: {cond}")
+
+        a, op, imm = m.groups()
+
+        code.append(f"cmp ${a[1:]}, {imm}")
+
+        if op == "<":
+            code.append(f"bge {end}")
+        elif op == ">":
+            code.append(f"ble {end}")
+        elif op == "==":
+            code.append(f"bne {end}")
+
+    # body
     for line in body_lines:
         code += compile([line])
 
