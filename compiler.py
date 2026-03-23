@@ -15,6 +15,9 @@ def new_label(prefix="L"):
     label_counter += 1
     return label
 
+def get_indent(line):
+    return len(line) - len(line.lstrip(" "))
+
 def parse_expr(left, expr):
     expr = expr.strip()
 
@@ -149,8 +152,10 @@ def compile_if(condition, body_lines):
             code.append(f"bne {end}")
 
     # body
-    for line in body_lines:
-        code += compile([line])
+    # for line in body_lines:
+    #     code += compile([line])
+    # This is needed for multiline and nested if and while cases to not break
+    code += compile(body_lines)
 
     code.append(f"{end}:")
     return code
@@ -174,14 +179,53 @@ def compile_while(condition, body_lines):
     code.append(f"cmp ${a[1]}, ${b[1]}")
     code.append(f"bge {end}")  # exit if not <
 
-    for line in body_lines:
-        code += compile([line])
+    # for line in body_lines:
+    #     code += compile([line])
+
+    # This is needed for multiline and nested if and while cases to not break
+    code += compile(body_lines)
 
     code.append(f"jmp {start}")
     code.append(f"{end}:")
 
     return code
 
+def postprocess_labels(lines):
+    # First collect all label names
+    labels = set()
+
+    for line in lines:
+        # line = line.strip()
+        if line.endswith(":"):
+            label = line[:-1]
+            labels.add(label)
+
+    out = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        # -----------------------------
+        # Case 1: label definition
+        # -----------------------------
+        if stripped.endswith(":"):
+            label = stripped[:-1]
+            out.append(f"@{label}:")
+            continue
+
+        # -----------------------------
+        # Case 2: instruction with label
+        # -----------------------------
+        # Replace only standalone label tokens
+        for label in labels:
+            # match whole word only (avoid partial replacements)
+            pattern = rf"\b{label}\b"
+            replacement = f">{label}"
+            stripped = re.sub(pattern, replacement, stripped)
+
+        out.append(stripped)
+
+    return out
 
 def compile(lines):
     i = 0
@@ -196,7 +240,8 @@ def compile(lines):
 
             body = []
             while i < len(lines) and lines[i].startswith("    "):
-                body.append(lines[i].strip())
+                # body.append(lines[i].strip())
+                body.append(lines[i][4:].rstrip("\n"))
                 i += 1
 
             out += compile_while(condition, body)
@@ -207,7 +252,8 @@ def compile(lines):
             i += 1
             body = []
             while i < len(lines) and lines[i].startswith("    "):
-                body.append(lines[i].strip())
+                # body.append(lines[i].strip())
+                body.append(lines[i][4:].rstrip("\n"))
                 i += 1
             out += compile_if(condition, body)
             continue
@@ -244,6 +290,8 @@ if __name__=="__main__":
     '''
 
     asm = compile(program)
+
+    asm = postprocess_labels(asm) # Postprocessing to fix syntax...
 
     for line in asm:
         print(line)
