@@ -66,6 +66,11 @@ def parse_expr(left, expr):
     if m:
         return ("sub", m.group(1), m.group(2))
 
+    # x - 5
+    m = re.match(r"(x\d+)\s*\-\s*(\d+)", expr)
+    if m:
+        return ("sub_imm", m.group(1), int(m.group(2)))
+
     # x
     if re.match(r"x\d+", expr):
         return ("mov", expr)
@@ -106,6 +111,9 @@ def compile_line(line):
 
         if expr[0] == "sub":
             return [f"sub ${left[1]}, ${expr[1][1]}, ${expr[2][1]}"]
+
+        if expr[0] == "sub_imm":
+            return [f"sub ${left[1]}, ${expr[1][1]}, {expr[2]}"]
 
         if expr[0] == "lsl":
             return [f"lsl ${left[1]}, ${expr[1][1]}, {expr[2]}"]
