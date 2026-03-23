@@ -1,19 +1,23 @@
 x3 = 0
 while x3 < x1:
     x4 = 0
-    while x4 < x1:
-        x7 = x4 + 1
-        if x7 < x1:
-            x5 = x0 + x4
-            x6 = mem[x5]
-            x7 = x5 + 1
-            x2 = mem[x7]
 
-            if x6 > x2:
-                mem[x5] = x2
-                mem[x7] = x6
+    x7 = x1 - x3
+    x7 = x7 - 1
+
+    while x4 < x7:
+        x5 = x0 + x4
+        x6 = mem[x5]
+
+        x8 = x5 + 1
+        x2 = mem[x8]
+
+        if x6 > x2:
+            mem[x5] = x2
+            mem[x8] = x6
 
         x4 = x4 + 1
+
     x3 = x3 + 1
 
 x4 = mem[x0]
