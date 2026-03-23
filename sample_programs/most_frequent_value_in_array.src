@@ -9,12 +9,13 @@ while x3 < x1:
         x5 = x0 + x4
         x6 = mem[x5]
 
-        x8 = x5 + 1
-        x2 = mem[x8]
+        x7 = x5 + 1
+        x7 = mem[x7]
 
-        if x6 > x2:
-            mem[x5] = x2
-            mem[x8] = x6
+        if x6 > x7:
+            mem[x5] = x7
+            x7 = x5 + 1
+            mem[x7] = x6
 
         x4 = x4 + 1
 
