@@ -116,6 +116,7 @@ def compile_line(line):
     return []
 
 def compile_if(condition, body_lines):
+    dprint("condition: "+str(condition))
     cond = condition.strip()
     end = new_label("ifend")
     code = []
@@ -190,6 +191,9 @@ def compile_while(condition, body_lines):
 
     return code
 
+def is_blank(line):
+    return line.strip() == ""
+
 def postprocess_labels(lines):
     # First collect all label names
     labels = set()
@@ -227,34 +231,69 @@ def postprocess_labels(lines):
 
     return out
 
-def compile(lines):
+def compile(lines, base_indent=0):
     i = 0
     out = []
 
     while i < len(lines):
-        line = lines[i].strip()
+        raw = lines[i]
+        indent = get_indent(raw)
+        line = raw.strip()
+
+        if line == "": # Ignore blank lines
+            i += 1
+            continue
+
+        if indent < base_indent:
+            break  # end of this block
 
         if line.startswith("while"):
             condition = line[len("while"):].strip().rstrip(":")
             i += 1
 
             body = []
-            while i < len(lines) and lines[i].startswith("    "):
-                # body.append(lines[i].strip())
-                body.append(lines[i][4:].rstrip("\n"))
-                i += 1
+            while i < len(lines):
+                if is_blank(lines[i]):
+                    body.append(lines[i])
+                    i += 1
+                    continue
 
+                if get_indent(lines[i]) > indent:
+                    body.append(lines[i])
+                    i += 1
+                    continue
+
+                break
+
+            # out += compile_while(condition, compile(body))
+            dprint("Compiling while with this body here: '''"+str(body)+"'''")
             out += compile_while(condition, body)
             continue
 
         if line.startswith("if"):
             condition = line[len("if"):].strip().rstrip(":")
             i += 1
+
             body = []
-            while i < len(lines) and lines[i].startswith("    "):
-                # body.append(lines[i].strip())
-                body.append(lines[i][4:].rstrip("\n"))
-                i += 1
+            # while i < len(lines) and get_indent(lines[i]) > indent:
+            #     body.append(lines[i])
+            #     i += 1
+            
+            while i < len(lines):
+                if is_blank(lines[i]):
+                    body.append(lines[i])
+                    i += 1
+                    continue
+
+                if get_indent(lines[i]) > indent:
+                    body.append(lines[i])
+                    i += 1
+                    continue
+
+                break
+
+            dprint("Compiling if with this body here: '''"+str(body)+"'''")
+            # out += compile_if(condition, compile(body))
             out += compile_if(condition, body)
             continue
 
@@ -262,7 +301,6 @@ def compile(lines):
         i += 1
 
     return out
-
 
 # -----------------------------
 # Example usage
