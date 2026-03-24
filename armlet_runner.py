@@ -2,6 +2,8 @@ import subprocess
 import re
 
 def run_program(asm_file):
+    cmd = ["sbt", 'runMain armlet.ArmletRunner ' + asm_file]
+    print("[TEST] Running "+str(" ".join("'"+x+"'" for x in cmd)))
     result = subprocess.run(
         ["sbt", 'runMain armlet.ArmletRunner ' + asm_file],
         capture_output=True,
