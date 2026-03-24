@@ -11,7 +11,7 @@ def run_program(asm_file):
         capture_output=True,
         text=True,
         shell=True,
-        timeout=2   # 🔥 KEY LINE
+        timeout=20   # 🔥 KEY LINE
     )
 
     if result.returncode != 0:
