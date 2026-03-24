@@ -245,12 +245,23 @@ def postprocess_labels(lines):
 
     return out
 
+def strip_comments(original: str) -> str:
+    # Check if "#" exists...
+    # Inefficient, but I don't care...
+    # while "#" in original:
+    #     original = original[:-1]
+
+    if "#" in original:
+        original = original[:original.index("#")]
+    return original
+
 def compile(lines, base_indent=0):
     i = 0
     out = []
 
     while i < len(lines):
         raw = lines[i]
+        raw = strip_comments(raw)
         indent = get_indent(raw)
         line = raw.strip()
 

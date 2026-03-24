@@ -38,8 +38,7 @@ while x3 < x1:
         x5 = x5 + 1
 
     if x7 != x4:
-        # CHECK BEFORE RESET
-        if x5 > x6:
+        if x6 < x5:
             x6 = x5
             x2 = x4
 
@@ -48,7 +47,6 @@ while x3 < x1:
 
     x3 = x3 + 1
 
-# FINAL CHECK
-if x5 > x6:
+if x6 < x5:
     x6 = x5
     x2 = x4

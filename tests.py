@@ -81,8 +81,23 @@ def run_test(src_filename):
 # -----------------------------
 # Run all tests
 # -----------------------------
+
+import sys # For command line parameter handling...
+
 def run_all_tests():
+
     files = [f for f in os.listdir(TEST_SRC_DIR) if f.endswith(".src")]
+
+    if len(sys.argv) == 2: # Check if only one test is supplied...
+        fn = sys.argv[1] # Get the file from sys.argv...
+        if fn not in files:
+            print("Invalid test file")
+            exit(1)
+        if run_test(fn):
+            print("Passed!!!")
+        else:
+            print("Failed!!!")
+        exit(0)
 
     total = len(files)
     passed = 0
