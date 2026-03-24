@@ -96,6 +96,8 @@ def compile_line(line):
 
         if expr[0] == "store_register":
             return [f"sto ${expr[1][1]}, ${expr[2][1]}"]
+            # Actually in reality the store instruction is the other way around...
+            # return [f"sto ${expr[2][1]}, ${expr[1][1]}"]
 
         if expr[0] == "mov":
             return [f"mov ${left[1]}, ${expr[1][1]}"]
@@ -130,7 +132,7 @@ def compile_if(condition, body_lines):
     code = []
 
     # x OP x
-    m = re.match(r"(x\d+)\s*(==|<|>)\s*(x\d+)", cond)
+    m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(x\d+)", cond)
     if m:
         a, op, b = m.groups()
 
@@ -142,10 +144,12 @@ def compile_if(condition, body_lines):
             code.append(f"ble {end}")
         elif op == "==":
             code.append(f"bne {end}")
+        elif op == "!=":
+            code.append(f"beq {end}")
 
     else:
         # x OP immediate
-        m = re.match(r"(x\d+)\s*(==|<|>)\s*(\d+)", cond)
+        m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(\d+)", cond)
         if not m:
             raise Exception(f"unsupported if condition: {cond}")
 
@@ -159,6 +163,8 @@ def compile_if(condition, body_lines):
             code.append(f"ble {end}")
         elif op == "==":
             code.append(f"bne {end}")
+        elif op == "!=":
+            code.append(f"beq {end}")
 
     # body
     # for line in body_lines:
