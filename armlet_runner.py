@@ -2,13 +2,15 @@ import subprocess
 import re
 
 def run_program(asm_file):
-    cmd = ["sbt", 'runMain armlet.ArmletRunner ' + asm_file]
-    print("[TEST] Running "+str(" ".join("'"+x+"'" for x in cmd)))
+    cmd = f"sbt 'armlet/runMain armlet.ArmletRunner {asm_file}'"
+
+    print("[TEST] Running", cmd)
+
     result = subprocess.run(
-        ["sbt", 'runMain armlet.ArmletRunner ' + asm_file],
+        cmd,
         capture_output=True,
         text=True,
-        shell=True
+        shell=True   # ✅ OK now because cmd is a string
     )
 
     if result.returncode != 0:
@@ -17,7 +19,6 @@ def run_program(asm_file):
         raise Exception("Execution failed")
 
     return result.stdout
-
 
 def parse_registers(output):
     regs = {}
