@@ -99,6 +99,14 @@ class Emulator:
         if self.debug:
             print(msg)
 
+    def wrap16(self, v: int) -> int:
+        return v & 0xFFFF
+
+    def to_signed(self, v: int) -> int:
+        if v & 0x8000:
+            return v - 0x10000
+        return v
+
     def check_reg(self, name: str):
         if name not in self.regs:
             raise RuntimeError(f"Invalid register {name}; only x0..x7 exist")
@@ -132,12 +140,12 @@ class Emulator:
         # x + y or x + 5 or more general atom + atom
         m = re.fullmatch(r"(.+?)\s*\+\s*(.+)", expr)
         if m:
-            return self.eval_expr(m.group(1)) + self.eval_expr(m.group(2))
+            return self.wrap16(self.eval_expr(m.group(1)) + self.eval_expr(m.group(2)))
 
         # x - y or x - 5 or more general atom - atom
         m = re.fullmatch(r"(.+?)\s*-\s*(.+)", expr)
         if m:
-            return self.eval_expr(m.group(1)) - self.eval_expr(m.group(2))
+            return self.wrap16(self.eval_expr(m.group(1)) - self.eval_expr(m.group(2)))
 
         return self.eval_atom(expr)
 
@@ -147,8 +155,8 @@ class Emulator:
         for op in ["==", "!=", "<", ">"]:
             parts = cond.split(op)
             if len(parts) == 2:
-                a = self.eval_expr(parts[0].strip())
-                b = self.eval_expr(parts[1].strip())
+                a = self.to_signed(self.eval_expr(parts[0].strip()))
+                b = self.to_signed(self.eval_expr(parts[1].strip()))
                 dprint("a: "+str(a))
                 dprint("b: "+str(b))
 
