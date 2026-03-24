@@ -42,10 +42,17 @@ object ArmletRunner:
         val parts = line.split(":")
         val reg = parts(0).trim
         val valueBits = parts(1).trim
-
+        // println(s"valueBits: $valueBits")
+        val bitString = valueBits.split(" ")(0)
+        // println(s"bitString: $bitString")
         val value = armlet.bitsToInt(
-          valueBits.reverse.map(_ == '1').toArray
+          bitString.reverse.map(_ == '1')
         )
+        /*
+        val value = armlet.bitsToInt(
+          valueBits.map(_ == '1').toArray
+        )
+        */
 
         println(s"$reg=$value")
 

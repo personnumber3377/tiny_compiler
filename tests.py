@@ -19,6 +19,13 @@ EXPECTED = {
     "loop_increment.src": {0: 10},
     "memory_store_load.src": {2: 42},
     "branch_if.src": {2: 1},
+    "nested_while_sum.src": {0: 10},
+    "nested_if.src": {2: 42},
+    "if_inside_while.src": {2: 5},
+    "while_inside_if.src": {2: 10},
+    "memory_sum.src": {2: 10},
+    "simple_swap.src": {5: 3, 6: 5},
+    "if_chain.src": {1: 2},
 }
 
 
@@ -53,6 +60,7 @@ def run_test(src_filename):
 
     # Run
     output = armlet_runner.run_program(asm_path)
+    print("Got this output here: "+str(output))
     regs = armlet_runner.parse_registers(output)
 
     expected = EXPECTED.get(src_filename, {})
