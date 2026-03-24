@@ -1,7 +1,9 @@
 import re
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
+import sys
 
+DEBUG = "--debug" in sys.argv
 
 # ---------- AST nodes ----------
 
@@ -37,6 +39,10 @@ def strip_comment(line: str) -> str:
 def get_indent(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
 
+def dprint(msg):
+    if DEBUG:
+        print("[DEBUG] "+str(msg))
+    return
 
 def parse_program(lines: List[str], base_indent: int = 0, start: int = 0) -> Tuple[List[Statement], int]:
     stmts = []
@@ -143,6 +149,8 @@ class Emulator:
             if len(parts) == 2:
                 a = self.eval_expr(parts[0].strip())
                 b = self.eval_expr(parts[1].strip())
+                dprint("a: "+str(a))
+                dprint("b: "+str(b))
 
                 if op == "==":
                     return a == b
@@ -191,6 +199,7 @@ class Emulator:
 
         if isinstance(stmt, WhileStmt):
             while self.eval_condition(stmt.condition):
+                print("eval_condition: "+str(stmt.condition))
                 self.exec_block(stmt.body)
             return
 
@@ -198,8 +207,9 @@ class Emulator:
 
     def exec_block(self, stmts: List[Statement]):
         for stmt in stmts:
-            print("Current statement: "+str(stmt))
-            self.dump_registers_string()
+            dprint("Current statement: "+str(stmt))
+            if DEBUG:
+                self.dump_registers_string()
             self.exec_stmt(stmt)
 
     def run(self, source: str):
@@ -223,10 +233,8 @@ class Emulator:
 
 # ---------- Example usage ----------
 
-import sys
-
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         fh = open(sys.argv[1], "r")
         source = fh.read()
         fh.close()
