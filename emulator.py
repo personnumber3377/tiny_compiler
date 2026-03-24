@@ -199,7 +199,7 @@ class Emulator:
 
         if isinstance(stmt, WhileStmt):
             while self.eval_condition(stmt.condition):
-                print("eval_condition: "+str(stmt.condition))
+                dprint("eval_condition: "+str(stmt.condition))
                 self.exec_block(stmt.body)
             return
 
