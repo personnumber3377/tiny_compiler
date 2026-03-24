@@ -1,0 +1,92 @@
+import os
+import subprocess
+import re
+import compiler
+import armlet_runner
+
+TEST_SRC_DIR = "test_src"
+WORK_DIR = "work"
+
+# Ensure work dir exists
+os.makedirs(WORK_DIR, exist_ok=True)
+
+
+# -----------------------------
+# Expected results (hardcoded)
+# -----------------------------
+EXPECTED = {
+    "simple_add.src": {2: 7},
+    "loop_increment.src": {0: 10},
+    "memory_store_load.src": {2: 42},
+    "branch_if.src": {2: 1},
+}
+
+
+# -----------------------------
+# Compile source → assembly
+# -----------------------------
+def compile_to_asm(src_path, asm_path):
+    with open(src_path) as f:
+        program = f.readlines()
+
+    asm = compiler.compile(program)
+    asm = compiler.postprocess_labels(asm)
+
+    with open(asm_path, "w") as f:
+        # Optional wrapper (you can extend this)
+        for line in asm:
+            f.write(line + "\n")
+        f.write("hlt\n")
+
+
+# -----------------------------
+# Run one test
+# -----------------------------
+def run_test(src_filename):
+    src_path = os.path.join(TEST_SRC_DIR, src_filename)
+    asm_path = os.path.join(WORK_DIR, src_filename.replace(".src", ".s"))
+
+    print(f"\n[TEST] {src_filename}")
+
+    # Compile
+    compile_to_asm(src_path, asm_path)
+
+    # Run
+    output = armlet_runner.run_program(asm_path)
+    regs = armlet_runner.parse_registers(output)
+
+    expected = EXPECTED.get(src_filename, {})
+
+    ok = True
+    for reg, exp_val in expected.items():
+        actual = regs.get(reg)
+        if actual != exp_val:
+            print(f"❌ FAIL: x{reg} expected {exp_val}, got {actual}")
+            ok = False
+
+    if ok:
+        print("✅ PASS")
+
+    return ok
+
+
+# -----------------------------
+# Run all tests
+# -----------------------------
+def run_all_tests():
+    files = [f for f in os.listdir(TEST_SRC_DIR) if f.endswith(".src")]
+
+    total = len(files)
+    passed = 0
+
+    for f in files:
+        if run_test(f):
+            passed += 1
+
+    print("\n====================")
+    print(f"Passed {passed}/{total} tests")
+    print("====================")
+
+
+if __name__ == "__main__":
+    run_all_tests()
