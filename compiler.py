@@ -175,6 +175,7 @@ def compile_if(condition, body_lines):
     code.append(f"{end}:")
     return code
 
+'''
 def compile_while(condition, body_lines):
     cond = condition.strip()
 
@@ -198,6 +199,46 @@ def compile_while(condition, body_lines):
     #     code += compile([line])
 
     # This is needed for multiline and nested if and while cases to not break
+    code += compile(body_lines)
+
+    code.append(f"jmp {start}")
+    code.append(f"{end}:")
+
+    return code
+'''
+
+def compile_while(condition, body_lines):
+    cond = condition.strip()
+
+    start = new_label("whilestart")
+    end = new_label("whileend")
+
+    code = []
+    code.append(f"{start}:")
+
+    # -------------------------
+    # Case 1: x < x
+    # -------------------------
+    m = re.match(r"(x\d+)\s*<\s*(x\d+)", cond)
+    if m:
+        a, b = m.groups()
+        code.append(f"cmp ${a[1]}, ${b[1]}")
+        code.append(f"bge {end}")
+
+    else:
+        # -------------------------
+        # Case 2: x < immediate
+        # -------------------------
+        m = re.match(r"(x\d+)\s*<\s*(\d+)", cond)
+        if m:
+            a, imm = m.groups()
+            code.append(f"cmp ${a[1]}, {imm}")
+            code.append(f"bge {end}")
+
+        else:
+            raise Exception(f"Unsupported while condition: {cond}")
+
+    # body
     code += compile(body_lines)
 
     code.append(f"jmp {start}")
