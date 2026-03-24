@@ -1,5 +1,6 @@
 x3 = 0
-while x3 < x1 - 1:
+x7 = x1 - 1
+while x3 < x7:
     x4 = 0
 
     x2 = x1 - x3
@@ -23,6 +24,8 @@ while x3 < x1 - 1:
 
     x3 = x3 + 1
 
+# --- frequency phase ---
+
 x4 = mem[x0]
 x5 = 1
 x2 = x4
@@ -37,7 +40,6 @@ while x3 < x1:
         x5 = x5 + 1
 
     if x7 != x4:
-        # CHECK BEFORE RESET
         if x5 > x6:
             x6 = x5
             x2 = x4
@@ -47,7 +49,6 @@ while x3 < x1:
 
     x3 = x3 + 1
 
-# FINAL CHECK
 if x5 > x6:
     x6 = x5
     x2 = x4
