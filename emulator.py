@@ -239,6 +239,27 @@ class Emulator:
         return self.mem[start:start + count]
 
 
+# This is supposed to be called from somewhere else...
+
+def run_python_emulator(source: str, data=None):
+    emu = Emulator(debug=False)
+
+    if data is None:
+        data = []
+
+    emu.regs["x0"] = 0
+    emu.regs["x1"] = len(data)
+
+    for i, v in enumerate(data):
+        emu.mem[i] = v
+
+    emu.run(source)
+
+    return {
+        "regs": emu.dump_registers(),
+        "mem": emu.mem[:len(data)]
+    }
+
 # ---------- Example usage ----------
 
 if __name__ == "__main__":
