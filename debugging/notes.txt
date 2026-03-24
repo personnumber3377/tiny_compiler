@@ -1,0 +1,60 @@
+
+# x3 = 0
+mov $3, 0
+x3 = 0
+# x7 = x1 - 1
+sub $7, $1, 1
+# while x3 < x7:
+@whilestart0:
+	# while x3 < x7:
+	cmp $3, $7
+	bge >whileend1
+	# x4 = 0
+	mov $4, 0
+	# x2 = x1 - x3
+	sub $2, $1, $3
+	# x2 = x2 - 1
+	sub $2, $2, 1
+
+	# while x4 < x2:
+	@whilestart2:
+		# Here is the while loop decision shit...
+		cmp $4, $2
+		bge >whileend3
+		# 
+		# x5 = x0 + x4
+		# x6 = mem[x5]
+		add $5, $0, $4
+		loa $6, $5
+
+		# x7 = x5 + 1
+		add $7, $5, 1
+		# x7 = mem[x7]
+		loa $7, $7
+
+		# if x6 > x7:
+		cmp $6, $7
+		ble >ifend4 # If x6 is less than or equal to x7 then skip over the thing...
+			# mem[x5] = x7
+			sto $5, $7
+			# x7 = x0 + x4
+			add $7, $0, $4
+			# x7 = x7 + 1
+			add $7, $7, 1
+			# mem[x7] = x6
+			sto $7, $6
+		@ifend4:
+		# x4 = x4 + 1
+		add $4, $4, 1
+		jmp >whilestart2
+	@whileend3:
+	add $3, $3, 1
+	jmp >whilestart0
+@whileend1:
+
+end the outer while loop
+
+
+
+
+

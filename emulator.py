@@ -198,6 +198,8 @@ class Emulator:
 
     def exec_block(self, stmts: List[Statement]):
         for stmt in stmts:
+            print("Current statement: "+str(stmt))
+            self.dump_registers_string()
             self.exec_stmt(stmt)
 
     def run(self, source: str):
@@ -209,6 +211,11 @@ class Emulator:
 
     def dump_registers(self):
         return {k: self.regs[k] for k in sorted(self.regs.keys())}
+
+    def dump_registers_string(self):
+        print("Registers:")
+        for k, v in emu.dump_registers().items():
+            print(f"  {k} = {v}")
 
     def dump_memory(self, start: int = 0, count: int = 16):
         return self.mem[start:start + count]
@@ -245,9 +252,7 @@ if __name__ == "__main__":
 
     emu.run(source)
 
-    print("Registers:")
-    for k, v in emu.dump_registers().items():
-        print(f"  {k} = {v}")
+    emu.dump_registers_string()
 
     print("\nSorted memory:")
     print(emu.dump_memory(0, len(data)))
