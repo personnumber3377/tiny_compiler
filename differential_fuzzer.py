@@ -7,6 +7,10 @@ from emulator import run_python_emulator
 WORK_DIR = "work"
 os.makedirs(WORK_DIR, exist_ok=True)
 
+def run_scala(asm_path):
+    output = armlet_runner.run_program(asm_path)
+    regs = armlet_runner.parse_registers(output)
+    return regs
 
 # -------------------------
 # Random program generator
@@ -37,12 +41,14 @@ def rand_if():
     ]
 
 def rand_while():
-    a = rand_reg()
-    b = rand_reg()
+    counter = rand_reg()
+    limit = random.randint(1, 5)
+
     return [
-        f"while {a} < {b}:",
+        f"{counter} = 0",
+        f"while {counter} < {limit}:",
         f"    {rand_assign()}",
-        f"    {a} = {a} + 1"
+        f"    {counter} = {counter} + 1",
     ]
 
 def generate_program():
@@ -52,7 +58,8 @@ def generate_program():
     for r in REGS:
         lines.append(f"{r} = {random.randint(0,10)}")
 
-    for _ in range(random.randint(5, 15)):
+    # for _ in range(random.randint(5, 15)):
+    for _ in range(random.randint(1, 5)):
         t = random.random()
         if t < 0.5:
             lines.append(rand_assign())
@@ -99,6 +106,7 @@ def fuzz(iterations=1000):
         print(f"\n[FUZZ] iteration {i}")
 
         prog = generate_program()
+        print("[FUZZ] "+str(prog))
         asm_path = os.path.join(WORK_DIR, "fuzz.s")
 
         try:

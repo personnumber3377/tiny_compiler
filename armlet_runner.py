@@ -4,18 +4,17 @@ import re
 def run_program(asm_file):
     cmd = f"sbt 'armlet/runMain armlet.ArmletRunner {asm_file}'"
 
-    print("[TEST] Running", cmd)
+    print("[TEST] Running "+" ".join(cmd))
 
     result = subprocess.run(
         cmd,
         capture_output=True,
         text=True,
-        shell=True   # ✅ OK now because cmd is a string
+        shell=True,
+        timeout=2   # 🔥 KEY LINE
     )
 
     if result.returncode != 0:
-        print(result.stdout)
-        print(result.stderr)
         raise Exception("Execution failed")
 
     return result.stdout
