@@ -216,60 +216,17 @@ class Emulator:
 
 # ---------- Example usage ----------
 
+import sys
+
 if __name__ == "__main__":
-    source = r"""
-x3 = 0
-while x3 < x1 - 1:
-    x4 = 0
-
-    x2 = x1 - x3
-    x2 = x2 - 1
-
-    while x4 < x2:
-        x5 = x0 + x4
-        x6 = mem[x5]
-
-        x7 = x5 + 1
-        x7 = mem[x7]
-
-        if x6 > x7:
-            mem[x5] = x7
-
-            x7 = x0 + x4
-            x7 = x7 + 1
-            mem[x7] = x6
-
-        x4 = x4 + 1
-
-    x3 = x3 + 1
-
-x4 = mem[x0]
-x5 = 1
-x2 = x4
-x6 = 1
-x3 = 1
-
-while x3 < x1:
-    x7 = x0 + x3
-    x7 = mem[x7]
-
-    if x7 == x4:
-        x5 = x5 + 1
-
-    if x7 != x4:
-        if x5 > x6:
-            x6 = x5
-            x2 = x4
-
-        x4 = x7
-        x5 = 1
-
-    x3 = x3 + 1
-
-if x5 > x6:
-    x6 = x5
-    x2 = x4
-"""
+    if len(sys.argv) == 2:
+        fh = open(sys.argv[1], "r")
+        source = fh.read()
+        fh.close()
+    else:
+        print("File not specified...")
+        exit(1)
+    
 
     emu = Emulator(debug=False)
 
