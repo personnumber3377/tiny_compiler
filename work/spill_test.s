@@ -9,36 +9,41 @@ mov $3, $7
 mov $7, 5
 mov $4, $7
 mov $7, 6
-mov $5, $7
-mov $7, 7
-mov $6, $7
-mov $7, 8
 mov $6, $7
 mov $7, 1000
 sto $7, $6
-mov $7, 9
+mov $7, 7
 mov $6, $7
 mov $7, 1001
 sto $7, $6
-mov $7, 1000
+mov $7, 8
+mov $6, $7
+mov $7, 1002
+sto $7, $6
+mov $7, 9
+mov $6, $7
+mov $7, 1003
+sto $7, $6
+mov $7, 1002
+loa $6, $7
+mov $7, 1003
+loa $5, $7
+add $7, $6, $5
+mov $6, $7
+mov $7, 1004
+sto $7, $6
+mov $7, 1004
 loa $6, $7
 mov $7, 1001
 loa $5, $7
 add $7, $6, $5
 mov $6, $7
-mov $7, 1002
+mov $7, 1005
 sto $7, $6
-mov $7, 1002
-loa $6, $7
-mov $5, $6
-add $7, $6, $5
-mov $6, $7
-mov $7, 1003
-sto $7, $6
-mov $7, 1002
+mov $7, 1004
 loa $7, $7
 mov $2, $7
-mov $7, 1003
+mov $7, 1005
 loa $7, $7
 mov $3, $7
 hlt

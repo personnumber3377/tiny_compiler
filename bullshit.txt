@@ -1,0 +1,81 @@
+
+# Let us set up some test data ...
+
+        mov     $0, >test_data  # set up the address where to get the data
+        mov     $1, >test_len   # set up address where to get the length
+        loa     $1, $1          # load the length from memory to $1
+
+# Your solution starts here...
+
+mov $3, 0
+sub $6, $1, 1
+@whilestart0:
+cmp $3, $6
+bge >whileend1
+mov $4, 0
+sub $2, $1, $3
+sub $2, $2, 1
+@whilestart2:
+cmp $4, $2
+bge >whileend3
+add $5, $0, $4
+loa $7, $5
+add $6, $5, 1
+loa $6, $6
+cmp $7, $6
+ble >ifend4
+sto $5, $6
+add $6, $0, $4
+add $6, $6, 1
+sto $6, $7
+@ifend4:
+add $4, $4, 1
+jmp >whilestart2
+@whileend3:
+add $3, $3, 1
+jmp >whilestart0
+@whileend1:
+loa $4, $0
+mov $5, 1
+mov $2, $4
+mov $6, 1
+mov $3, 1
+@whilestart5:
+cmp $3, $1
+bge >whileend6
+add $7, $0, $3
+loa $7, $7
+cmp $7, $4
+bne >ifend7
+add $5, $5, 1
+@ifend7:
+cmp $7, $4
+beq >ifend8
+cmp $5, $6
+ble >ifend9
+mov $6, $5
+mov $2, $4
+@ifend9:
+mov $4, $7
+mov $5, 1
+@ifend8:
+add $3, $3, 1
+jmp >whilestart5
+@whileend6:
+cmp $5, $6
+ble >ifend10
+mov $6, $5
+mov $2, $4
+@ifend10:
+
+# Test data starts here...
+
+	hlt
+
+@test_len:
+        %data   25
+@test_data:
+        %data   28923, 23130, 4809, 44797, 33345, 26862, 11608, 11608, 30127, 23130, 50720, 33345, 28923, 44797, 4809, 44797, 3977, 50720, 19570, 11608, 19570, 33345, 41386, 33345, 50720
+
+
+
