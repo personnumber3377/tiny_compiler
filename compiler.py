@@ -5,6 +5,8 @@ label_counter = 0
 
 DEBUG = True
 
+SIGNED_COMPARISONS = True
+
 def dprint(msg: str): # Debug printing
     if DEBUG:
         print("[DEBUG] "+str(msg))
@@ -131,6 +133,16 @@ def compile_if(condition, body_lines):
     end = new_label("ifend")
     code = []
 
+    # bge
+    # ble
+    # bgt
+    # blt
+
+    # bae
+    # bbe
+    # bab
+    # bbw
+
     # x OP x
     m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(x\d+)", cond)
     if m:
@@ -139,9 +151,15 @@ def compile_if(condition, body_lines):
         code.append(f"cmp ${a[1:]}, ${b[1:]}")
 
         if op == "<":
-            code.append(f"bge {end}")
+            if SIGNED_COMPARISONS:
+                code.append(f"bge {end}")
+            else:
+                code.append(f"bae {end}")
         elif op == ">":
-            code.append(f"ble {end}")
+            if SIGNED_COMPARISONS:
+                code.append(f"ble {end}")
+            else:
+                code.append(f"bbe {end}")
         elif op == "==":
             code.append(f"bne {end}")
         elif op == "!=":
