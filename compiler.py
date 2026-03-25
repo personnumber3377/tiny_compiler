@@ -267,9 +267,11 @@ def compile_if(condition, body_lines):
         code.append("cmp $6, $5")
 
         if op == "<":
-            code.append(f"bae {end}")
+            code.append(f"bae {end}")   # skip if a >= b
         elif op == ">":
-            code.append(f"bbe {end}")
+            code.append(f"bae {end}")   # ❗ WRONG BEFORE
+            # FIX BELOW
+            code[-1] = f"bbe {end}"     # skip if a <= b
         elif op == "==":
             code.append(f"bne {end}")
         elif op == "!=":
@@ -285,7 +287,7 @@ def compile_if(condition, body_lines):
         if op == "<":
             code.append(f"bae {end}")
         elif op == ">":
-            code.append(f"bbe {end}")
+            code.append(f"bbe {end}")   # skip if <=
         elif op == "==":
             code.append(f"bne {end}")
         elif op == "!=":
@@ -311,7 +313,7 @@ def compile_while(condition, body_lines):
         code += load_var(a, 6)
         code += load_var(b, 5)
         code.append("cmp $6, $5")
-        code.append(f"bae {end}")
+        code.append(f"bae {end}")   # exit if a >= b
 
     else:
         m = re.match(r"(x\d+)\s*<\s*(\d+)", cond)
