@@ -5,6 +5,8 @@ import sys
 
 DEBUG = "--debug" in sys.argv
 
+SIGNED = "--signed" in sys.argv
+
 # ---------- AST nodes ----------
 
 @dataclass
@@ -140,13 +142,18 @@ class Emulator:
         # x + y or x + 5 or more general atom + atom
         m = re.fullmatch(r"(.+?)\s*\+\s*(.+)", expr)
         if m:
-            return self.wrap16(self.eval_expr(m.group(1)) + self.eval_expr(m.group(2)))
+            if SIGNED:
+                return self.wrap16(self.eval_expr(m.group(1)) + self.eval_expr(m.group(2)))
+            else:
+                return self.eval_expr(m.group(1)) + self.eval_expr(m.group(2))
 
         # x - y or x - 5 or more general atom - atom
         m = re.fullmatch(r"(.+?)\s*-\s*(.+)", expr)
         if m:
-            return self.wrap16(self.eval_expr(m.group(1)) - self.eval_expr(m.group(2)))
-
+            if SIGNED:
+                return self.wrap16(self.eval_expr(m.group(1)) - self.eval_expr(m.group(2)))
+            else:
+                return self.eval_expr(m.group(1)) - self.eval_expr(m.group(2))
         return self.eval_atom(expr)
 
     def eval_condition(self, cond: str) -> bool:
@@ -155,8 +162,12 @@ class Emulator:
         for op in ["==", "!=", "<", ">"]:
             parts = cond.split(op)
             if len(parts) == 2:
-                a = self.to_signed(self.eval_expr(parts[0].strip()))
-                b = self.to_signed(self.eval_expr(parts[1].strip()))
+                if SIGNED:
+                    a = self.to_signed(self.eval_expr(parts[0].strip()))
+                    b = self.to_signed(self.eval_expr(parts[1].strip()))
+                else:
+                    a = self.eval_expr(parts[0].strip())
+                    b = self.eval_expr(parts[1].strip())
                 dprint("a: "+str(a))
                 dprint("b: "+str(b))
 
