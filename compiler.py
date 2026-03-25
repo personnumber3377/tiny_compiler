@@ -4,8 +4,43 @@ import sys # For command line handling
 label_counter = 0
 
 DEBUG = True
-
 SIGNED_COMPARISONS = False
+
+SPILL_BASE = 1000
+
+def is_spilled(x):
+    return int(x[1:]) >= 7
+
+def phys_reg(x):
+    return int(x[1:])
+
+def load_var(x, target):
+    idx = phys_reg(x)
+
+    if idx < 7:
+        if idx == target:
+            return []
+        return [f"mov ${target}, ${idx}"]
+    else:
+        addr = SPILL_BASE + (idx - 7)
+        return [
+            f"mov $7, {addr}",
+            f"loa ${target}, $7"
+        ]
+
+def store_var(x, source):
+    idx = phys_reg(x)
+
+    if idx < 7:
+        if idx == source:
+            return []
+        return [f"mov ${idx}, ${source}"]
+    else:
+        addr = SPILL_BASE + (idx - 7)
+        return [
+            f"mov $7, {addr}",
+            f"sto $7, ${source}"
+        ]
 
 def dprint(msg: str): # Debug printing
     if DEBUG:
@@ -102,7 +137,13 @@ def compile_line(line):
             # return [f"sto ${expr[2][1]}, ${expr[1][1]}"]
 
         if expr[0] == "mov":
-            return [f"mov ${left[1]}, ${expr[1][1]}"]
+            src = expr[1]
+            dst = left
+
+            code = []
+            code += load_var(src, 7)        # load into scratch
+            code += store_var(dst, 7)       # store from scratch
+            return code
 
         if expr[0] == "imm":
             return [f"mov ${left[1]}, {expr[1]}"]
@@ -132,7 +173,7 @@ def compile_if(condition, body_lines):
     cond = condition.strip()
     end = new_label("ifend")
     code = []
-    
+
     # x OP x
     m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(x\d+)", cond)
     if m:
