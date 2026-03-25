@@ -151,9 +151,16 @@ def compile_line(line):
             value = expr[2]
 
             code = []
+            '''
             code += load_var(addr, 6)   # address → $6
             code += load_var(value, 5)  # value   → $5
             code.append("sto $6, $5")
+            '''
+
+            code += load_var(addr, 6)
+            code += load_var(value, 7)
+            code.append("sto $6, $7")
+
             return code
 
         # -------------------------
@@ -242,8 +249,12 @@ def compile_line(line):
 
             code = []
             code += load_var(src, 6)     # address → $6
-            code.append("loa $5, $6")    # value → $5  (NOT $7)
-            code += store_var(dst, 5)    # store safely
+            # code.append("loa $5, $6")    # value → $5  (NOT $7)
+            # code += store_var(dst, 5)    # store safely
+            
+            code.append("loa $7, $6")
+            code += store_var(dst, 7)
+
             return code
 
     return []
@@ -269,9 +280,15 @@ def compile_if(condition, body_lines):
         if op == "<":
             code.append(f"bae {end}")   # skip if a >= b
         elif op == ">":
-            code.append(f"bae {end}")   # ❗ WRONG BEFORE
-            # FIX BELOW
-            code[-1] = f"bbe {end}"     # skip if a <= b
+            '''
+            code.append(f"bae {end}")
+            code[-1] = f"bbe {end}"
+            '''
+
+            # code[-1] = f"bbe {end}"
+
+            code.append(f"bbe {end}")
+
         elif op == "==":
             code.append(f"bne {end}")
         elif op == "!=":

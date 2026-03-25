@@ -1,0 +1,70 @@
+# =========================
+# BUBBLE SORT
+# =========================
+
+x3 = 0                 # i
+x8 = x1 - 1            # n-1 (outer bound)
+
+while x3 < x8:
+
+    x4 = 0             # j
+
+    x9 = x1 - x3       # n - i
+    x9 = x9 - 1        # inner bound
+
+    while x4 < x9:
+
+        x5 = x0 + x4   # addr A
+        x7 = mem[x5]   # A
+
+        x10 = x5 + 1   # addr B
+        x11 = mem[x10] # B
+
+        if x7 > x11:
+            mem[x5] = x11
+            mem[x10] = x7
+
+        x4 = x4 + 1
+
+    x3 = x3 + 1
+
+
+# =========================
+# FREQUENCY PHASE
+# =========================
+
+x12 = mem[x0]   # current value
+x13 = 1         # current count
+
+x2  = x12       # best value
+x14 = 1         # best count
+
+x3  = 1         # index
+
+while x3 < x1:
+
+    x15 = x0 + x3
+    x16 = mem[x15]
+
+    if x16 == x12:
+        x13 = x13 + 1
+
+    if x16 != x12:
+
+        if x13 > x14:
+            x14 = x13
+            x2  = x12
+
+        x12 = x16
+        x13 = 1
+
+    x3 = x3 + 1
+
+
+# =========================
+# FINAL CHECK
+# =========================
+
+if x13 > x14:
+    x14 = x13
+    x2  = x12

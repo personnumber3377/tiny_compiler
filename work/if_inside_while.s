@@ -5,9 +5,12 @@ mov $1, $7
 mov $7, 0
 mov $2, $7
 @whilestart0:
-cmp $0, $1
+mov $6, $0
+mov $5, $1
+cmp $6, $5
 bae >whileend1
-cmp $0, 5
+mov $6, $0
+cmp $6, 5
 bae >ifend2
 mov $6, $2
 add $7, $6, 1
