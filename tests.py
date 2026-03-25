@@ -26,6 +26,10 @@ EXPECTED = {
     "memory_sum.src": {2: 10},
     "simple_swap.src": {5: 3, 6: 5},
     "if_chain.src": {1: 2},
+    # FIX THIS TOO HERE:
+    # "spill_test.src": {9: 17,   # 8 + 9
+    #     10: 24   # 17 + 7
+    # }
 }
 
 
