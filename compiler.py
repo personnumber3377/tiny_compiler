@@ -163,7 +163,42 @@ def parse_expr(left, expr):
     if m:
         return ("sub_imm", m.group(1), int(m.group(2)))
 
-    if re.match(r"x\d+", expr):
+    # Here are some commonly used logical operators
+
+    # AND
+    m = re.match(r"(x\d+)\s*&\s*(x\d+)", expr)
+    if m:
+        return ("and", m.group(1), m.group(2))
+
+    m = re.match(r"(x\d+)\s*&\s*(\d+)", expr)
+    if m:
+        return ("and_imm", m.group(1), int(m.group(2)))
+
+    # OR
+    m = re.match(r"(x\d+)\s*\|\s*(x\d+)", expr)
+    if m:
+        return ("or", m.group(1), m.group(2))
+
+    m = re.match(r"(x\d+)\s*\|\s*(\d+)", expr)
+    if m:
+        return ("or_imm", m.group(1), int(m.group(2)))
+
+    # XOR
+    m = re.match(r"(x\d+)\s*\^\s*(x\d+)", expr)
+    if m:
+        return ("xor", m.group(1), m.group(2))
+
+    m = re.match(r"(x\d+)\s*\^\s*(\d+)", expr)
+    if m:
+        return ("xor_imm", m.group(1), int(m.group(2)))
+
+    # SHIFT RIGHT
+    m = re.match(r"(x\d+)\s*>>\s*(\d+)", expr)
+    if m:
+        return ("lsr", m.group(1), int(m.group(2)))
+
+    # if re.match(r"x\d+", expr): # This was too permissive as it incorrectly parsed "x1 = x2 & 2" as a simple mov instruction
+    if re.fullmatch(r"x\d+", expr):
         return ("mov", expr)
 
     if expr.isdigit():
@@ -298,6 +333,86 @@ def compile_line(line):
             code.append("loa $7, $6")
             code += store_var(dst, 7)
 
+            return code
+
+        # Logical operators:
+
+        if expr[0] == "and":
+            a, b = expr[1], expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code += load_var(b, 5)
+            code.append("and $7, $6, $5")
+            code += store_var(dst, 7)
+            return code
+
+        if expr[0] == "and_imm":
+            a = expr[1]
+            imm = expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code.append(f"and $7, $6, {imm}")
+            code += store_var(dst, 7)
+            return code
+
+        if expr[0] == "or":
+            a, b = expr[1], expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code += load_var(b, 5)
+            code.append("ior $7, $6, $5")
+            code += store_var(dst, 7)
+            return code
+
+        if expr[0] == "or_imm":
+            a = expr[1]
+            imm = expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code.append(f"ior $7, $6, {imm}")
+            code += store_var(dst, 7)
+            return code
+
+
+        if expr[0] == "xor":
+            a, b = expr[1], expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code += load_var(b, 5)
+            code.append("eor $7, $6, $5")
+            code += store_var(dst, 7)
+            return code
+
+        if expr[0] == "xor_imm":
+            a = expr[1]
+            imm = expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code.append(f"eor $7, $6, {imm}")
+            code += store_var(dst, 7)
+            return code
+
+        if expr[0] == "lsr":
+            a = expr[1]
+            shift = expr[2]
+            dst = left
+
+            code = []
+            code += load_var(a, 6)
+            code.append(f"lsr $7, $6, {shift}")
+            code += store_var(dst, 7)
             return code
 
     return []
