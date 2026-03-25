@@ -307,10 +307,52 @@ def compile_line(line):
 # Control flow (unchanged)
 # -----------------------------
 def compile_if(condition, body_lines):
+    cond = condition.strip()
     end = new_label("ifend")
 
     code = []
-    code += compile_condition(condition.strip(), end)
+
+    m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(x\d+)", cond)
+    if m:
+        a, op, b = m.groups()
+
+        code += load_var(a, 6)
+        code += load_var(b, 5)
+        code.append("cmp $6, $5")
+
+        if op == "<":
+            code.append(f"bae {end}")   # skip if a >= b
+        elif op == ">":
+            '''
+            code.append(f"bae {end}")
+            code[-1] = f"bbe {end}"
+            '''
+
+            # code[-1] = f"bbe {end}"
+
+            code.append(f"bbe {end}")
+
+        elif op == "==":
+            code.append(f"bne {end}")
+        elif op == "!=":
+            code.append(f"beq {end}")
+
+    else:
+        m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(\d+)", cond)
+        a, op, imm = m.groups()
+
+        code += load_var(a, 6)
+        code.append(f"cmp $6, {imm}")
+
+        if op == "<":
+            code.append(f"bae {end}")
+        elif op == ">":
+            code.append(f"bbe {end}")   # skip if <=
+        elif op == "==":
+            code.append(f"bne {end}")
+        elif op == "!=":
+            code.append(f"beq {end}")
+
     code += compile(body_lines)
     code.append(f"{end}:")
 
@@ -324,7 +366,23 @@ def compile_while(condition, body_lines):
 
     code = [f"{start}:"]
 
-    code += compile_condition(cond, end)
+    m = re.match(r"(x\d+)\s*<\s*(x\d+)", cond)
+    if m:
+        a, b = m.groups()
+
+        code += load_var(a, 6)
+        code += load_var(b, 5)
+        code.append("cmp $6, $5")
+        code.append(f"bae {end}")   # exit if a >= b
+
+    else:
+        print("cond: "+str(cond))
+        m = re.match(r"(x\d+)\s*<\s*(\d+)", cond)
+        a, imm = m.groups()
+
+        code += load_var(a, 6)
+        code.append(f"cmp $6, {imm}")
+        code.append(f"bae {end}")
 
     code += compile(body_lines)
     code.append(f"jmp {start}")
