@@ -5,7 +5,7 @@ label_counter = 0
 
 DEBUG = True
 
-SIGNED_COMPARISONS = True
+SIGNED_COMPARISONS = False
 
 def dprint(msg: str): # Debug printing
     if DEBUG:
@@ -176,9 +176,15 @@ def compile_if(condition, body_lines):
         code.append(f"cmp ${a[1:]}, {imm}")
 
         if op == "<":
-            code.append(f"bge {end}")
+            if SIGNED_COMPARISONS:
+                code.append(f"bge {end}")
+            else:
+                code.append(f"bae {end}")
         elif op == ">":
-            code.append(f"ble {end}")
+            if SIGNED_COMPARISONS:
+                code.append(f"ble {end}")
+            else:
+                code.append(f"bbe {end}")
         elif op == "==":
             code.append(f"bne {end}")
         elif op == "!=":
@@ -192,38 +198,6 @@ def compile_if(condition, body_lines):
 
     code.append(f"{end}:")
     return code
-
-'''
-def compile_while(condition, body_lines):
-    cond = condition.strip()
-
-    # parse condition like: x0 < x1
-    m = re.match(r"(x\d+)\s*<\s*(x\d+)", cond)
-    if not m:
-        raise Exception("Only supports x < y for now")
-
-    a, b = m.group(1), m.group(2)
-
-    start = new_label("whilestart")
-    end = new_label("whileend")
-
-    code = []
-    code.append(f"{start}:")
-
-    code.append(f"cmp ${a[1]}, ${b[1]}")
-    code.append(f"bge {end}")  # exit if not <
-
-    # for line in body_lines:
-    #     code += compile([line])
-
-    # This is needed for multiline and nested if and while cases to not break
-    code += compile(body_lines)
-
-    code.append(f"jmp {start}")
-    code.append(f"{end}:")
-
-    return code
-'''
 
 def compile_while(condition, body_lines):
     cond = condition.strip()
@@ -241,8 +215,12 @@ def compile_while(condition, body_lines):
     if m:
         a, b = m.groups()
         code.append(f"cmp ${a[1]}, ${b[1]}")
-        code.append(f"bge {end}")
-
+        # bge
+        # bae
+        if SIGNED_COMPARISONS:
+            code.append(f"bge {end}")
+        else:
+            code.append(f"bae {end}")
     else:
         # -------------------------
         # Case 2: x < immediate
@@ -251,8 +229,10 @@ def compile_while(condition, body_lines):
         if m:
             a, imm = m.groups()
             code.append(f"cmp ${a[1]}, {imm}")
-            code.append(f"bge {end}")
-
+            if SIGNED_COMPARISONS:
+                code.append(f"bge {end}")
+            else:
+                code.append(f"bae {end}")
         else:
             raise Exception(f"Unsupported while condition: {cond}")
 

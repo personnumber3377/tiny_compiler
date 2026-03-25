@@ -90,12 +90,12 @@ def parse_program(lines: List[str], base_indent: int = 0, start: int = 0) -> Tup
 # ---------- Emulator ----------
 
 class Emulator:
-    def __init__(self, memory_size: int = 65536, debug: bool = False):
+    def __init__(self, memory_size: int = 65536, debug: bool = True):
         self.regs = {f"x{i}": 0 for i in range(8)}
         self.mem = [0] * memory_size
         self.debug = debug
         self.step_counter = 0
-        self.max_steps = 1_000_000
+        self.max_steps = 1_000_000000
 
     def log(self, msg: str):
         if self.debug:
@@ -121,6 +121,7 @@ class Emulator:
             addr = self.eval_expr(m.group(1))
             if addr < 0 or addr >= len(self.mem):
                 raise RuntimeError(f"Memory read out of bounds: {addr}")
+            # self.log("Read from address "+str(hex(addr))+" and got the value of "+str(hex(self.mem[addr])))
             return self.mem[addr]
 
         if re.fullmatch(r"x[0-7]", expr):
@@ -162,14 +163,18 @@ class Emulator:
         for op in ["==", "!=", "<", ">"]:
             parts = cond.split(op)
             if len(parts) == 2:
+                a = self.eval_expr(parts[0].strip())
+                b = self.eval_expr(parts[1].strip())
+                '''
                 if SIGNED:
                     a = self.to_signed(self.eval_expr(parts[0].strip()))
                     b = self.to_signed(self.eval_expr(parts[1].strip()))
                 else:
                     a = self.eval_expr(parts[0].strip())
                     b = self.eval_expr(parts[1].strip())
-                dprint("a: "+str(a))
-                dprint("b: "+str(b))
+                '''
+                # dprint("a: "+str(a))
+                # dprint("b: "+str(b))
 
                 if op == "==":
                     return a == b
@@ -191,13 +196,13 @@ class Emulator:
             if addr < 0 or addr >= len(self.mem):
                 raise RuntimeError(f"Memory write out of bounds: {addr}")
             self.mem[addr] = value
-            self.log(f"mem[{addr}] = {value}")
+            # self.log(f"mem[{addr}] = {value}")
             return
 
         if re.fullmatch(r"x[0-7]", left):
             self.check_reg(left)
             self.regs[left] = value
-            self.log(f"{left} = {value}")
+            # self.log(f"{left} = {value}")
             return
 
         raise RuntimeError(f"Unsupported assignment target: {left}")
@@ -218,17 +223,25 @@ class Emulator:
 
         if isinstance(stmt, WhileStmt):
             while self.eval_condition(stmt.condition):
-                dprint("eval_condition: "+str(stmt.condition))
+                # dprint("eval_condition: "+str(stmt.condition))
                 self.exec_block(stmt.body)
             return
 
         raise RuntimeError(f"Unknown statement type: {stmt}")
 
+    def debug_point(self, statement):
+        # This is just to check if we should print the machine state and then stop execution temporarily
+        # 
+        if str(statement) == "Assign(left='x4', right='0')": # Hardcoded check for the thing...
+            dprint("Current statement: "+str(statement))
+            self.dump_registers_string()
+            i = input("Please press return to continue...")
+        return
+
     def exec_block(self, stmts: List[Statement]):
         for stmt in stmts:
-            dprint("Current statement: "+str(stmt))
             if DEBUG:
-                self.dump_registers_string()
+                self.debug_point(stmt)
             self.exec_stmt(stmt)
 
     def run(self, source: str):
@@ -283,7 +296,7 @@ if __name__ == "__main__":
         exit(1)
     
 
-    emu = Emulator(debug=False)
+    emu = Emulator(debug=True)
 
     # Set up the same test data
     data = [
