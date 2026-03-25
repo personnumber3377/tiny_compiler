@@ -10,3 +10,7 @@ x8 = 9
 
 x9 = x7 + x8
 x10 = x9 + x6
+
+# move results into real registers
+x2 = x9
+x3 = x10

@@ -30,6 +30,11 @@ EXPECTED = {
     # "spill_test.src": {9: 17,   # 8 + 9
     #     10: 24   # 17 + 7
     # }
+
+    "spill_test.src": {
+        2: 17,
+        3: 24
+    }
 }
 
 

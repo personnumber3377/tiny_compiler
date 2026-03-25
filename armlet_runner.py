@@ -4,7 +4,7 @@ import re
 def run_program(asm_file):
     cmd = f"sbt 'armlet/runMain armlet.ArmletRunner {asm_file}'"
 
-    print("[TEST] Running "+" ".join(cmd))
+    print("[TEST] Running "+cmd)
 
     result = subprocess.run(
         cmd,
