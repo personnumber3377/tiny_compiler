@@ -3,9 +3,9 @@ mov $1, 10
 mov $2, 0
 @whilestart0:
 cmp $0, $1
-bge >whileend1
+bae >whileend1
 cmp $0, 5
-bge >ifend2
+bae >ifend2
 add $2, $2, 1
 @ifend2:
 add $0, $0, 1

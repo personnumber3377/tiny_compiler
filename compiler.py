@@ -132,17 +132,7 @@ def compile_if(condition, body_lines):
     cond = condition.strip()
     end = new_label("ifend")
     code = []
-
-    # bge
-    # ble
-    # bgt
-    # blt
-
-    # bae
-    # bbe
-    # bab
-    # bbw
-
+    
     # x OP x
     m = re.match(r"(x\d+)\s*(==|<|>|!=)\s*(x\d+)", cond)
     if m:

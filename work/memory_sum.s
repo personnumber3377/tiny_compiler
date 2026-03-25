@@ -15,7 +15,7 @@ mov $2, 0
 mov $3, 0
 @whilestart5:
 cmp $3, $1
-bge >whileend6
+bae >whileend6
 add $4, $0, $3
 loa $5, $4
 add $2, $2, $5

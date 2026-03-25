@@ -7,7 +7,7 @@ sto $2, $1
 loa $3, $0
 loa $4, $2
 cmp $3, $4
-ble >ifend16
+bbe >ifend16
 sto $0, $4
 sto $2, $3
 @ifend16:
