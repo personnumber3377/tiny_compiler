@@ -4,22 +4,23 @@
 
 x3 = x1
 
-# scale: while x3*2 <= x0
+# Scale divisor up (find largest x3 = x1 * 2^k ≤ x0)
 while x3 < x0:
     x4 = x3 << 1
     if x4 > x0:
-        x3 = x0 # No break so must force exit with this janky shit...
+        break
     else:
         x3 = x4
 
-# division
+# Division phase
 while x3 > x1:
     if x0 > x3:
         x0 = x0 - x3
     x3 = x3 >> 1
 
-# final step
+# Final subtraction
 if x0 > x3:
     x0 = x0 - x3
 
 x2 = x0
+
