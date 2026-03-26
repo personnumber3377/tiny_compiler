@@ -490,10 +490,17 @@ def compile_if_else(condition, if_body, else_body):
     code += compile_condition(condition.strip(), else_label)
 
     # IF body
-    code += compile(if_body)
-
+    # code += compile(if_body)
     # Jump over else
-    code.append(f"jmp {end_label}")
+    # code.append(f"jmp {end_label}")
+
+    # IF body
+    if_code = compile(if_body)
+    code += if_code
+
+    # 🔥 Only add jump if IF body does NOT already end in jump
+    if not if_code or not if_code[-1].startswith("jmp"):
+        code.append(f"jmp {end_label}")
 
     # ELSE label
     code.append(f"{else_label}:")
@@ -552,9 +559,7 @@ def compile(lines, base_indent=0):
             out += compile_if_else(condition, body_if, body_else)
             continue
 
-        out += compile_line(line)
-        i += 1
-
+        # 🔥 HANDLE BREAK FIRST
         if line == "break":
             if not loop_stack:
                 raise Exception("break used outside of loop")
@@ -563,6 +568,10 @@ def compile(lines, base_indent=0):
             out.append(f"jmp {end_label}")
             i += 1
             continue
+
+        # normal line
+        out += compile_line(line)
+        i += 1
 
     return out
 
