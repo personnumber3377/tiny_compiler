@@ -472,6 +472,32 @@ def collect_block(lines, i, base_indent):
 
     return body, i
 
+def compile_if_else(condition, if_body, else_body):
+    else_label = new_label("else")
+    end_label = new_label("ifend")
+
+    code = []
+
+    # If condition false then jump to else
+    code += compile_condition(condition.strip(), else_label)
+
+    # IF body
+    code += compile(if_body)
+
+    # Jump over else
+    code.append(f"jmp {end_label}")
+
+    # ELSE label
+    code.append(f"{else_label}:")
+
+    # ELSE body
+    code += compile(else_body)
+
+    # END label
+    code.append(f"{end_label}:")
+
+    return code
+
 def compile(lines, base_indent=0):
     i = 0
     out = []
@@ -503,9 +529,19 @@ def compile(lines, base_indent=0):
             condition = line[len("if"):].strip().rstrip(":")
             i += 1
 
-            body, i = collect_block(lines, i, indent)
+            body_if, i = collect_block(lines, i, indent)
 
-            out += compile_if(condition, body)
+            # Check for "else" too. This basically supports "else" clauses
+            body_else = []
+            if i < len(lines):
+                next_line = lines[i]
+                next_line_clean = next_line.strip()
+
+                if next_line_clean.startswith("else"):
+                    i += 1
+                    body_else, i = collect_block(lines, i, indent)
+
+            out += compile_if_else(condition, body_if, body_else)
             continue
 
         out += compile_line(line)
