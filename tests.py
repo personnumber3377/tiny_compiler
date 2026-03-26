@@ -34,7 +34,19 @@ EXPECTED = {
     "spill_test.src": {
         2: 17,
         3: 24
-    }
+    },
+    "simple_if_else.src": {
+        2: 2
+    },
+    "nested_if_else.src": {
+        2: 42
+    },
+    "if_else_overwrite.src": {
+        2: 2
+    },
+    "if_else_in_while.src": {
+        2: 8
+    },
 }
 
 
