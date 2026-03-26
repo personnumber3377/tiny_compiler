@@ -7,12 +7,16 @@ mov $2, $7
 mov $6, $0
 mov $5, $1
 cmp $6, $5
-bae >ifend14
+bae >else28
 mov $6, $0
 cmp $6, 3
-beq >ifend15
+beq >else30
 mov $7, 42
 mov $2, $7
-@ifend15:
-@ifend14:
+jmp >ifend31
+@else30:
+@ifend31:
+jmp >ifend29
+@else28:
+@ifend29:
 hlt

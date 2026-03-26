@@ -35,11 +35,11 @@ mov $7, 0
 mov $2, $7
 mov $7, 0
 mov $3, $7
-@whilestart5:
+@whilestart10:
 mov $6, $3
 mov $5, $1
 cmp $6, $5
-bae >whileend6
+bae >whileend11
 mov $6, $0
 mov $5, $3
 add $7, $6, $5
@@ -57,6 +57,6 @@ mov $2, $7
 mov $6, $3
 add $7, $6, 1
 mov $3, $7
-jmp >whilestart5
-@whileend6:
+jmp >whilestart10
+@whileend11:
 hlt

@@ -22,14 +22,16 @@ mov $4, $7
 mov $6, $3
 mov $5, $4
 cmp $6, $5
-bbe >ifend16
+bbe >else32
 mov $6, $0
 mov $7, $4
 sto $6, $7
 mov $6, $2
 mov $7, $3
 sto $6, $7
-@ifend16:
+jmp >ifend33
+@else32:
+@ifend33:
 mov $6, $0
 loa $7, $6
 mov $6, $7

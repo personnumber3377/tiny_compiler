@@ -11,11 +11,13 @@ cmp $6, $5
 bae >whileend1
 mov $6, $0
 cmp $6, 5
-bae >ifend2
+bae >else2
 mov $6, $2
 add $7, $6, 1
 mov $2, $7
-@ifend2:
+jmp >ifend3
+@else2:
+@ifend3:
 mov $6, $0
 add $7, $6, 1
 mov $0, $7
