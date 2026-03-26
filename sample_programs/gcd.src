@@ -1,0 +1,50 @@
+# x0 = u
+# x1 = v
+# result -> x2
+
+# Count common factors of 2 in x3
+x3 = 0
+
+# Remove common powers of two from both u and v
+while x0 != 0:
+    x4 = x0 & 1
+    if x4 != 0:
+        break
+
+    x4 = x1 & 1
+    if x4 != 0:
+        break
+
+    x0 = x0 >> 1
+    x1 = x1 >> 1
+    x3 = x3 + 1
+
+# Make u odd
+while x0 != 0:
+    x4 = x0 & 1
+    if x4 != 0:
+        break
+    x0 = x0 >> 1
+
+# Main binary GCD loop
+while x1 != 0:
+    # Make v odd
+    while x1 != 0:
+        x4 = x1 & 1
+        if x4 != 0:
+            break
+        x1 = x1 >> 1
+
+    # Ensure u <= v
+    if x0 > x1:
+        x5 = x0
+        x0 = x1
+        x1 = x5
+
+    x1 = x1 - x0
+
+# Restore common power of two
+x2 = x0
+while x3 != 0:
+    x2 = x2 << 1
+    x3 = x3 - 1

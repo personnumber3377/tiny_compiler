@@ -2,31 +2,35 @@
 # x1 = divisor
 # result -> x2
 
-x3 = x1
-x4 = x0 >> 1
+if x1 != 1
 
-# Scale up without overflow:
-# keep doubling while x3 <= floor(x0 / 2)
-while x3 < x4:
-    x3 = x3 << 1
+    x3 = x1
+    x4 = x0 >> 1
 
-if x3 == x4:
-    x3 = x3 << 1
+    # Scale up without overflow:
+    # keep doubling while x3 <= floor(x0 / 2)
+    while x3 < x4:
+        x3 = x3 << 1
 
-# Division phase
-while x3 > x1:
-    if x0 > x3:
-        x0 = x0 - x3
+    if x3 == x4:
+        x3 = x3 << 1
+
+    # Division phase
+    while x3 > x1:
+        if x0 > x3:
+            x0 = x0 - x3
+        else:
+            if x0 == x3:
+                x0 = 0
+        x3 = x3 >> 1
+
+    # Final step for x1
+    if x0 > x1:
+        x0 = x0 - x1
     else:
-        if x0 == x3:
+        if x0 == x1:
             x0 = 0
-    x3 = x3 >> 1
 
-# Final step for x1
-if x0 > x1:
-    x0 = x0 - x1
+    x2 = x0
 else:
-    if x0 == x1:
-        x0 = 0
-
-x2 = x0
+    x2 = 0
