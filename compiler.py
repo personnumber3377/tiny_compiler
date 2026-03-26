@@ -498,7 +498,7 @@ def compile_if_else(condition, if_body, else_body):
     if_code = compile(if_body)
     code += if_code
 
-    # 🔥 Only add jump if IF body does NOT already end in jump
+    # Only add jump if IF body does NOT already end in jump
     if not if_code or not if_code[-1].startswith("jmp"):
         code.append(f"jmp {end_label}")
 

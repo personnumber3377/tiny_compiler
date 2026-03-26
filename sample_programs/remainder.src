@@ -1,10 +1,10 @@
 # x0 = dividend
 # x1 = divisor
-# result → x2
+# result -> x2
 
 x3 = x1
 
-# Scale divisor up (find largest x3 = x1 * 2^k ≤ x0)
+# Scale up
 while x3 < x0:
     x4 = x3 << 1
     if x4 > x0:
@@ -13,14 +13,12 @@ while x3 < x0:
         x3 = x4
 
 # Division phase
-while x3 > x1:
+while x3 > 0:
     if x0 > x3:
         x0 = x0 - x3
+    else:
+        if x0 == x3:
+            x0 = 0
     x3 = x3 >> 1
 
-# Final subtraction
-if x0 > x3:
-    x0 = x0 - x3
-
 x2 = x0
-
