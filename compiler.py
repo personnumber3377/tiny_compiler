@@ -17,6 +17,8 @@ SPILL_BASE = 1000
 
 NUM_REAL_REGS = 5  # x0–x4
 
+loop_stack = [] # This is needed for break and control flow...
+
 def phys_reg(x):
     return int(x[1:])
 
@@ -439,11 +441,17 @@ def compile_while(condition, body_lines):
 
     code = [f"{start}:"]
 
-    code += compile_condition(cond, end)
+    # 🔥 PUSH loop end label
+    loop_stack.append(end)
 
+    code += compile_condition(cond, end)
     code += compile(body_lines)
+
     code.append(f"jmp {start}")
     code.append(f"{end}:")
+
+    # 🔥 POP after loop
+    loop_stack.pop()
 
     return code
 
@@ -546,6 +554,15 @@ def compile(lines, base_indent=0):
 
         out += compile_line(line)
         i += 1
+
+        if line == "break":
+            if not loop_stack:
+                raise Exception("break used outside of loop")
+
+            end_label = loop_stack[-1]
+            out.append(f"jmp {end_label}")
+            i += 1
+            continue
 
     return out
 
